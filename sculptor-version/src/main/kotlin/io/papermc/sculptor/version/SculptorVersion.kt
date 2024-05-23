@@ -99,7 +99,7 @@ class SculptorVersion : Plugin<Project> {
             description = "Apply decompilation patches to the source."
 
             val typeDir = mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER).name.lowercase()
-            val patchesDir = target.layout.projectDirectory.dir("${typeDir}/patches")
+            val patchesDir = target.layout.projectDirectory.dir("patches")
             if (patchesDir.asFile.exists()) {
                 patchDir.set(patchesDir)
             }
@@ -118,7 +118,7 @@ class SculptorVersion : Plugin<Project> {
             failedPatchJar.set(target.layout.buildDirectory.file(FAILED_PATCH_JAR))
 
             val typeDir = mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER).name.lowercase()
-            sourceDir.set(target.layout.projectDirectory.dir("${typeDir}/src/main/java"))
+            sourceDir.set(target.layout.projectDirectory.dir("src/main/java"))
         }
 
         applyPatches.configure {
@@ -141,7 +141,7 @@ class SculptorVersion : Plugin<Project> {
 
         val copyResources by target.tasks.registering(Sync::class) {
             val typeDir = mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER).name.lowercase()
-            into(target.layout.projectDirectory.dir("${typeDir}/src/main/resources"))
+            into(target.layout.projectDirectory.dir("src/main/resources"))
             if (mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER) == MinecraftJarType.SERVER) {
                 from(target.zipTree(extractServerJar.flatMap { it.serverJar })) {
                     exclude("**/*.class", "META-INF/**")
@@ -166,8 +166,17 @@ class SculptorVersion : Plugin<Project> {
             description = "Rebuild decompilation patches from the current source set."
             decompJar.set(decompileJar.flatMap { it.outputJar })
             val typeDir = mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER).name.lowercase()
-            sourceDir.set(target.layout.projectDirectory.dir("${typeDir}/src/main/java"))
-            patchDir.set(target.layout.projectDirectory.dir("${typeDir}/patches"))
+            sourceDir.set(target.layout.projectDirectory.dir("src/main/java"))
+            patchDir.set(target.layout.projectDirectory.dir("patches"))
+        }
+
+        target.tasks.register("copySide",Sync::class){
+            group = "mache"
+            description = "Copy the side files to the project"
+            val typeDir = mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER).name.lowercase()
+            from(target.layout.projectDirectory.dir("src"))
+            into(target.layout.projectDirectory.dir("${typeDir}/src"))
+            includeEmptyDirs = false
         }
 
         mache.runs.all {
@@ -315,7 +324,7 @@ class SculptorVersion : Plugin<Project> {
             }
             into("patches") {
                 val typeDir = mache.minecraftJarType.getOrElse(MinecraftJarType.SERVER).name.lowercase()
-                from(target.layout.projectDirectory.dir("${typeDir}/patches"))
+                from(target.layout.projectDirectory.dir("patches"))
             }
 
             archiveBaseName.set("mache")
