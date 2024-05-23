@@ -26,6 +26,7 @@ kotlin {
 }
 
 repositories {
+    mavenLocal()
     maven("https://repo.papermc.io/repository/maven-releases/") {
         name = "PaperMC"
         mavenContent {

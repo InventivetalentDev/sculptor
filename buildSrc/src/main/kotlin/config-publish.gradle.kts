@@ -54,6 +54,7 @@ val shadowJar by tasks.existing(ShadowJar::class) {
 
 publishing {
     repositories {
+        mavenLocal()
         val url = if (project.version.toString().endsWith("-SNAPSHOT")) {
             "https://repo.papermc.io/repository/maven-snapshots/"
         } else {
